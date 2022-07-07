@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf8'?>
+<main>
+    <gborn>
+        <czubek_gory_exp>ddddddddsaaaaaaaasddddddddsaaaaaaaasddddddddsaaaaaaaasddddddddsaaaasqaaa</czubek_gory_exp>
+        <czubek_gory_return>wwwwwww</czubek_gory_return>
+        <vole_exp train="false">ddddddddddddsaaaaaaaaaaaasdsasdsasdsasdsasdsasddwwdssdwwdssdwwdssdwwdssdwwdssdwwwaaawdddwaaawdddwaaaaaaaeddddddwaaaaaawdddddd</vole_exp>
+        <vole_return train="false">wwaaaaaaaaaaaa</vole_return>
+        <osrodek_badawczy_exp>dddddddsaaaaaaasdddddddsaaaaaaasdddddddsaaaaaaasdddddddsaaazwaaa</osrodek_badawczy_exp>
+        <osrodek_badawczy_return>wwwwwww</osrodek_badawczy_return>
+        <ksiezyc_gamma_exp>ddddsaaaasddddsaaaasddddsaaaasddddsaaaasdddddddsaaaaaaasdddddddsaaaaaaasddddddddddddwaaaawddddwaaaawddddwaaaawwdsdwdsdwwaaaaaaawdddddddwaaaaaaawdddddddwaaaaaaa</ksiezyc_gamma_exp>
+        <ksiezyc_gamma_return>aaaaa</ksiezyc_gamma_return>
+        <baria_exp>dddddddddddddddddsaaaaaaaasddddddddsaaaaaaaasddddddddsaaaaaaaasddddddddsaaaaaaaaaaaawwwaasdsasdzddddddddddddddsaaaaaaaaaaaaaasddddddddddddddsaaaaaaaaaaaaaasddddddddddddddsaaaaaaaaaaaaaaaasddddddddddddddddsaaaaaaaaaaaaaaaasddddddddddddddddsaaaaaaaaaaaaaaaaa</baria_exp>
+        <baria_return>wwwwwwwwwwwwwwwww</baria_return>
+    </gborn>
+    <reborn>
+    
+    </reborn>
+    <basic>
+    
+    </basic>
+</main>
