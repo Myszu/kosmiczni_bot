@@ -11,12 +11,15 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import TimeoutException
 import xml.etree.ElementTree as ET
 from pynput.keyboard import Controller
-from datetime import  datetime
+from datetime import datetime
 import win32gui, win32com.client
 from time import sleep
+import logging
 
 version = '1.13'
 speaker = win32com.client.Dispatch("SAPI.SpVoice")
+logging.basicConfig(filename='logs.log', filemode='w', format='%(levelname)s || %(asctime)s - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
+
 
 class Main(QDialog):
     def __init__(self, parent=None):
@@ -62,7 +65,7 @@ class Main(QDialog):
             try:
                 combobox = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.ID, 'server_choose')))
             except TimeoutException:
-                print("Loading took too much time!")
+                logging.error('Timeout. Loading took to much time.')
             
             select = Select(browser.find_element(By.ID, 'server_choose'))
             select.select_by_visible_text('Server 1')
@@ -74,7 +77,7 @@ class Main(QDialog):
             try:
                 chars = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'li.option')))
             except TimeoutException:
-                print("Loading took too much time!")
+                logging.error('Timeout. Loading took to much time.')
             
             character = browser.find_element(By.CSS_SELECTOR, 'li.option')
             character.click()
@@ -96,11 +99,11 @@ class Main(QDialog):
                 alert = browser.find_element(By.CLASS_NAME, 'close_kom')
                 alert.click()
             except TimeoutException:
-                print("There was no alert!")
+                logging.error('There was no alert to close!')
                 
         except:
             browser.close()
-            self.error_label.setText('Something went wrong uppon logging in. Try again.')
+            self.error_label.setText('Something went wrong while logging in. Try again.')
             
 
 # Exping Function
@@ -142,6 +145,7 @@ class Main(QDialog):
                 if moves < 1:
                     moves = int(self.browser.find_element(By.ID, 'char_pa').text)
             except Exception as EX:
+                logging.critical('Something went wrong while loading the path.')
                 self.error_label.setText(str(EX))
                 
             try:
@@ -149,6 +153,7 @@ class Main(QDialog):
                 if loopBreak < 1:
                     loopBreak = 60
             except Exception as EX:
+                logging.critical('Something went wrong while loading break time.')
                 self.error_label.setText(str(EX))
             
             for j in range(moves):
@@ -198,10 +203,12 @@ class Main(QDialog):
                 if (j + 1) < moves:
                     sleep(loopBreak)
             
-            speaker.Speak('Poop')
+            logging.info('Session ended, all loops done.')
+            speaker.Speak('Koniec')
                 
         except Exception as EX:
             self.error_label.setText(str(EX))
+            logging.critical('Something went wrong while executing loops.')
             speaker.Speak('Błąd')
        
        
@@ -345,12 +352,16 @@ class Main(QDialog):
     def enum_callback(self, hwnd, results):
         self.winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
         
+        
+def start_app():
+    app = QApplication(sys.argv)
+    win = Main()
+    widget = QStackedWidget()
+    widget.addWidget(win)
+    widget.setWindowTitle('Auto-Kosmiczni')
+    widget.setWindowIcon(QIcon('gui/img/icon.ico'))
+    widget.show()
+    sys.exit(app.exec())
 
-app = QApplication(sys.argv)
-win = Main()
-widget = QStackedWidget()
-widget.addWidget(win)
-widget.setWindowTitle('Auto-Kosmiczni')
-widget.setWindowIcon(QIcon('gui/img/icon.ico'))
-widget.show()
-sys.exit(app.exec())
+if __name__ == '__main__':
+    start_app()
