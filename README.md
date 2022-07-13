@@ -2,7 +2,7 @@
 
 ## Description
 
-A bot for web browser game [Kosmiczni](https://kosmiczni.pl/). It is designed to pilot your character and help with the most repetitive task in game - crousing around the map and encountering mobs. Patterns are assigned to maps and are written in file, hence are easy to modify by user. In fact - project includes seperate tool for captchuring pressed keys while traveling through map and are then saved to separatee file to use.
+A bot for web browser game [Kosmiczni](https://kosmiczni.pl/). It is designed to pilot your character and help with the most repetitive task in game - crousing around the map and encountering mobs. Patterns are assigned to maps and are written in file, hence are easy to modify by user. In fact - project includes seperate tool for capturing pressed keys while traveling through map and are then saved to separatee file to use.
 
 Whole project is in very early state. I started it to learn Python and Selenium. Since then my skills advance drastically, yet I couldn't find the time to develop it further. Hopefully creating repository will push mi a little into consistency.
 
