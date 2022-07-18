@@ -28,6 +28,11 @@ class Main(QDialog):
         self.get_values.clicked.connect(self.scrap)
         self.restart_exp.clicked.connect(self.exping)
         self.try_button.clicked.connect(self.tryout)
+        
+        servers = ['Server 1', 'Server M', 'Server 8', 'Server 9', 'Server 10', 'Server 11', 'Server 12', 'Server 13', 'Server 14', 'Server 15', 'Server 16', 'Server 17', 'Server 18', 'Server Speed']
+            
+        for server in servers:
+            self.server_combo.addItem(server)
 
 
 # Log in and get to map
@@ -59,16 +64,17 @@ class Main(QDialog):
             submit.click()
             
             # Choose server
+            serv = self.server_combo.currentText()
             self.stoper('Server: ') 
             submit = browser.find_element(By.ID, 'cg_login_button2')
-            
+
             try:
                 combobox = WebDriverWait(browser, delay).until(EC.presence_of_element_located((By.ID, 'server_choose')))
             except TimeoutException:
                 logging.error('Timeout. Loading took to much time.')
-            
+
             select = Select(browser.find_element(By.ID, 'server_choose'))
-            select.select_by_visible_text('Server 1')
+            select.select_by_visible_text(serv)
             
             submit.click()
             
