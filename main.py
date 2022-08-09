@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QDialog, QListWidgetItem, QStackedWidget
 from PyQt5.uic import loadUi
@@ -16,7 +16,7 @@ import win32gui, win32com.client
 from time import sleep
 import logging
 
-version = '1.13'
+version = '1.14'
 speaker = win32com.client.Dispatch("SAPI.SpVoice")
 logging.basicConfig(filename='logs.log', filemode='w', format='%(levelname)s || %(asctime)s - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
 
@@ -162,12 +162,22 @@ class Main(QDialog):
                 logging.critical('Something went wrong while loading break time.')
                 self.error_label.setText(str(EX))
             
+            over = Overlay()
+            over.show()
+            
             for j in range(moves):
                 start_exp = self.browser.find_element(By.ID, 'char_exp').text
                 start_exp = int(start_exp.replace(' ', ''))
                 start_lvl = int(self.browser.find_element(By.ID, 'char_level').text)
                 
-                for letter in input_exp:
+                for iteration, letter in enumerate(input_exp):
+                    self.letter = j
+                    self.moves = moves
+                    self.iteration = iteration
+                    self.inputs = input_exp
+                    
+                    over.update()
+                    
                     elite = self.browser.find_element(By.ID, 'mob_' + mobId +'_rank_' + str(mobRank) + '_am')
                     elites = elite.text
                     multiAttack = self.browser.find_element(By.CSS_SELECTOR, '#mob_' + mobId +'_mf > button:nth-child(2)')
@@ -209,6 +219,7 @@ class Main(QDialog):
                 if (j + 1) < moves:
                     sleep(loopBreak)
             
+            over.close()
             logging.info('Session ended, all loops done.')
             speaker.Speak('Koniec')
                 
@@ -357,6 +368,29 @@ class Main(QDialog):
 # Searching For Firefox Window with game open 
     def enum_callback(self, hwnd, results):
         self.winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
+
+
+class Overlay(QDialog):
+    def __init__(self):
+        super().__init__()
+        loadUi("gui/over.ui", self)
+        
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setWindowTitle('Progress')
+
+
+    def update(self):
+        self.main = Main()
+        
+        self.currentLoop = self.main.letter
+        self.loops = self.main.moves
+        
+        self.currentIteration = self.main.iteration
+        self.iterations = self.main.inputs
+        
+        self.curr_loop.setText(f'Petla: {self.currentLoop}/{self.loops}')
+        self.curr_move.setText(f'Ruch: {self.currentIteration}/{self.iterations}')
         
         
 def start_app():
