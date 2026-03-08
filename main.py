@@ -1,4 +1,4 @@
-import logging
+import logging, os, platform
 
 from time import sleep
 from selenium.webdriver.firefox import webdriver
@@ -10,15 +10,31 @@ from modules import config as cfg
 from modules.interface import UserInterface
 
 # LOGGING FORMAT
-logging.basicConfig(format=f'%(asctime)s | %(levelname)s - %(message)s', datefmt='%d.%m.%Y %H:%M:%S', level=logging.INFO, filename=r'./logs/main.log', force=True)
+log_path = './logs'
+if not os.path.exists(log_path):
+    os.mkdir(log_path)
+logging.basicConfig(format=f'%(asctime)s | %(levelname)s - %(message)s', datefmt='%d.%m.%Y %H:%M:%S', level=logging.INFO, filename=f'{log_path}/main.log', force=True)
 
 class Bot():
     def __init__(self) -> None:
+        if cfg.DEBUGGING:
+            logging.info(f"Initializing bot")
         self.browser = webdriver.WebDriver()
         self.browser.implicitly_wait(1)
         self.browser.get('https://kosmiczni.pl/')
         self.wait = WebDriverWait(self.browser, cfg.WAIT)
+        
+    def debugger(func):
+        def myinner(self):
+            name = func.__name__
+            if cfg.DEBUGGING:
+                logging.info(f"Started {name} procedure")
+            func(self)
+            if cfg.DEBUGGING:
+                logging.info(f"Ended {name} procedure")
+        return myinner
 
+    @debugger
     def login(self) -> None:
         login = self.wait.until(EC.presence_of_element_located((By.ID, 'login_login')))
         login.send_keys(cfg.LOGIN)
@@ -29,6 +45,7 @@ class Bot():
         submit = self.browser.find_element(By.ID, 'cg_login_button1')
         submit.click()
     
+    @debugger
     def choose_server(self) -> None:
         server = self.wait.until(EC.presence_of_element_located((By.ID, 'server_choose')))
         server.click()
@@ -37,12 +54,14 @@ class Bot():
         
         submit = self.browser.find_element(By.ID, 'cg_login_button2')
         submit.click()
-        
+    
+    @debugger
     def choose_char(self) -> None:
         chars_list = self.wait.until(EC.presence_of_element_located((By.ID, 'char_list_con')))
-        chars = chars_list.find_elements(By.TAG_NAME, 'li')
+        chars = self.wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, 'li')))
         chars[0].click()
-        
+    
+    @debugger
     def login_successful(self) -> bool:
         try:
             stats = self.wait.until(EC.presence_of_element_located((By.ID, 'main_char_stats')))
@@ -52,7 +71,8 @@ class Bot():
                 return True
         except:
             return False
-        
+    
+    @debugger
     def is_ssj(self) -> bool:
         try:
             ssj = self.wait.until(EC.presence_of_element_located((By.ID, 'ssj_status')))
@@ -60,11 +80,12 @@ class Bot():
                 return True
         except:
             return False
-        
+    
+    @debugger
     def play_loop(self) -> None:
         if not self.is_ssj():
             pass
-        
+
 if __name__ == "__main__":
     try:
         bot = Bot()
@@ -83,4 +104,5 @@ if __name__ == "__main__":
     except:
         logging.exception('Error in main procedure.')
     finally:
+        logging.info('Quitting bot.')
         bot.browser.quit()
