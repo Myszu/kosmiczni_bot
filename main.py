@@ -1,9 +1,12 @@
-import logging, os, platform
+import logging, os
 
 from time import sleep
-from selenium.webdriver.firefox import webdriver
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
 from selenium.webdriver.common.by import By
 
 from modules import config as cfg
@@ -19,24 +22,76 @@ class Bot():
     def __init__(self) -> None:
         if cfg.DEBUGGING:
             logging.info(f"Initializing bot")
-        self.browser = webdriver.WebDriver()
+        options = Options()
+        options.set_preference("dom.webnotifications.enabled", False)
+        options.set_preference("webdriver_click", False)
+        self.browser = Firefox(options=options)
         self.browser.implicitly_wait(1)
-        self.browser.get('https://kosmiczni.pl/')
         self.wait = WebDriverWait(self.browser, cfg.WAIT)
+        self.wait_l = WebDriverWait(self.browser, cfg.WAIT*2)
+        self.wait_xl = WebDriverWait(self.browser, cfg.WAIT*3)
         
-    def debugger(func):
+    def _debugger(func):
         def myinner(self):
             name = func.__name__
             if cfg.DEBUGGING:
                 logging.info(f"Started {name} procedure")
-            func(self)
+            
+            result = func(self) # Wrapped function
+            
             if cfg.DEBUGGING:
                 logging.info(f"Ended {name} procedure")
+            sleep(cfg.PROCEEDURE_WAIT)
+            
+            if result:
+                return result # Returns if the wrapped function is returning
         return myinner
 
-    @debugger
+    def _incremental_wait(self, ec: EC = EC.presence_of_element_located, by: By = By.ID, value: str = None) -> WebElement | list[WebElement]:
+        try:
+            sleep(cfg.PROCEEDURE_WAIT)
+            return self.wait.until(ec((by, value)))
+        except TimeoutException:
+            try:
+                sleep(cfg.PROCEEDURE_WAIT)
+                return self.wait_l.until(ec((by, value)))
+            except TimeoutException:
+                try:
+                    sleep(cfg.PROCEEDURE_WAIT)
+                    return self.wait_xl.until(ec((by, value)))
+                finally:
+                    logging.exception(f"Failed all tries to find \"{value}\" element")
+    
+    def _try_click(self, element: WebElement, aggresive: bool = False) -> None:
+        if not aggresive:
+            try:
+                element.click()
+                return
+            except ElementClickInterceptedException:
+                try:
+                    pop_up = self._incremental_wait(EC.presence_of_element_located, By.ID, 'close_kom')
+                    pop_up.click()
+                    
+                    sleep(cfg.PROCEEDURE_WAIT)
+                    element.click()
+                    return
+                except ElementClickInterceptedException:
+                    self._try_click(element, True)
+                    return
+        try:
+            rect = element.rect
+            x = rect['x'] + rect['width'] / 2
+            y = rect['y'] + rect['height'] / 2
+            self.browser.execute_script("""let el = document.elementFromPoint(arguments[0],arguments[1]); if(el) el.remove();""",x,y)
+            logging.warning('Aggresive removal method was used to release obstructed view.')
+        finally:
+            return
+        
+    @_debugger
     def login(self) -> None:
-        login = self.wait.until(EC.presence_of_element_located((By.ID, 'login_login')))
+        self.browser.get('https://kosmiczni.pl/')
+        
+        login = self._incremental_wait(EC.presence_of_element_located, By.ID, 'login_login')
         login.send_keys(cfg.LOGIN)
 
         password = self.browser.find_element(By.ID, 'login_pass')
@@ -45,61 +100,61 @@ class Bot():
         submit = self.browser.find_element(By.ID, 'cg_login_button1')
         submit.click()
     
-    @debugger
+    @_debugger
     def choose_server(self) -> None:
-        server = self.wait.until(EC.presence_of_element_located((By.ID, 'server_choose')))
-        server.click()
-        servers = server.find_elements(By.TAG_NAME, 'option')
+        server_list = self._incremental_wait(EC.element_to_be_clickable, By.ID, 'server_choose')
+        self._try_click(server_list)
+        
+        servers = server_list.find_elements(By.TAG_NAME, 'option')
         servers[0].click()
         
         submit = self.browser.find_element(By.ID, 'cg_login_button2')
         submit.click()
     
-    @debugger
+    @_debugger
     def choose_char(self) -> None:
-        chars_list = self.wait.until(EC.presence_of_element_located((By.ID, 'char_list_con')))
-        chars = self.wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, 'li')))
+        chars_list = self._incremental_wait(EC.presence_of_element_located, By.ID, 'char_list_con')
+        chars = self._incremental_wait(EC.presence_of_all_elements_located, By.CSS_SELECTOR, '#char_list_con > li.option')
+        chars = chars_list.find_elements(By.TAG_NAME, 'li')
         chars[0].click()
     
-    @debugger
+    @_debugger
     def login_successful(self) -> bool:
         try:
-            stats = self.wait.until(EC.presence_of_element_located((By.ID, 'main_char_stats')))
+            stats = self._incremental_wait(EC.presence_of_element_located ,By.ID, 'main_char_stats')
             if stats:
                 self.browser.execute_script("war_container.style.display = 'none'")
-                self.ui = UserInterface(self.browser)
                 return True
         except:
             return False
     
-    @debugger
+    @_debugger
     def is_ssj(self) -> bool:
         try:
-            ssj = self.wait.until(EC.presence_of_element_located((By.ID, 'ssj_status')))
+            ssj = self._incremental_wait(EC.presence_of_element_located, By.ID, 'ssj_status')
             if ssj:
                 return True
         except:
             return False
     
-    @debugger
+    @_debugger
     def play_loop(self) -> None:
-        if not self.is_ssj():
-            pass
+        self.ui = UserInterface(self.browser)
+        self.ui.prepare_quick_bar()
+        if transformed:= not self.is_ssj():
+            self.ui.transform.click()
+        sleep(cfg.PROCEEDURE_WAIT)
+        self.ui.map.click()
+        sleep(cfg.PROCEEDURE_WAIT)
 
 if __name__ == "__main__":
     try:
         bot = Bot()
         bot.login()
-        sleep(cfg.PROCEEDURE_WAIT)
         bot.choose_server()
-        sleep(cfg.PROCEEDURE_WAIT)
         bot.choose_char()
-        sleep(cfg.PROCEEDURE_WAIT)
-        if bot.login_successful():
-            if bot.is_ssj():
-                sleep(5)
-            else:
-                bot.ui.transform.click()
+        if logged:= bot.login_successful():
+            bot.play_loop()
         sleep(5)
     except:
         logging.exception('Error in main procedure.')

@@ -18,9 +18,18 @@ class UserInterface():
     
     def prepare_quick_bar(self) -> None:
         quick_bar = self.browser.find_element(By.ID, 'quick_bar')
-        options = quick_bar.find_elements(By.TAG_NAME, 'ul')
+        options = quick_bar.find_elements(By.TAG_NAME, 'div')
         for option in options:
             if option.get_attribute('data-option') == 'use_teleport':
                 self.teleport: WebElement = option
             elif option.get_attribute('data-option') == 'use_transform':
                 self.transform: WebElement = option
+            elif option.get_attribute('data-option') == 'daily_reward':
+                self.daily: WebElement = option
+            elif option.get_attribute('data-option') == 'game_buffs':
+                self.blessings: WebElement = option
+            elif option.get_attribute('data-option') == 'quick_use_subs':
+                self.potions: WebElement = option
+            elif option.get_attribute('data-option') == 'game_empire':
+                self.empire: WebElement = option
+            
