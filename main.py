@@ -141,7 +141,7 @@ class Bot():
     def play_loop(self) -> None:
         self.ui = UserInterface(self.browser)
         self.ui.prepare_quick_bar()
-        if transformed:= not self.is_ssj():
+        if not self.is_ssj():
             self.ui.transform.click()
         sleep(cfg.PROCEEDURE_WAIT)
         self.ui.map.click()

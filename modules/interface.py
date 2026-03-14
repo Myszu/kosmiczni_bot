@@ -3,8 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
 class UserInterface():
-    def __init__(self, browser) -> None:
-        self.browser: webdriver.WebDriver = browser
+    def __init__(self, browser: webdriver.WebDriver) -> None:
+        self.browser = browser
         self.update_interface()
     
     def update_interface(self) -> None:
