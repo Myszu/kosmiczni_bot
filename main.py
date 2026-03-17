@@ -11,11 +11,10 @@ from selenium.webdriver.common.by import By
 
 from modules import config as cfg
 from modules.interface import UserInterface
+from modules.character import Char
 
 # LOGGING FORMAT
 log_path = './logs'
-if not os.path.exists(log_path):
-    os.mkdir(log_path)
 logging.basicConfig(format=f'%(asctime)s | %(levelname)s - %(message)s', datefmt='%d.%m.%Y %H:%M:%S', level=logging.INFO, filename=f'{log_path}/main.log', force=True)
 
 class Bot():
@@ -140,9 +139,11 @@ class Bot():
     @_debugger
     def play_loop(self) -> None:
         self.ui = UserInterface(self.browser)
+        self.character = Char(self.browser)
         self.ui.prepare_quick_bar()
         if not self.is_ssj():
             self.ui.transform.click()
+        self.character.walk("DOWN")
         sleep(cfg.PROCEEDURE_WAIT)
         self.ui.map.click()
         sleep(cfg.PROCEEDURE_WAIT)
