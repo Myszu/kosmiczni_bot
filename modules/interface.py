@@ -1,5 +1,6 @@
+import logging
 from typing import Literal
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from selenium.webdriver.firefox import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -61,10 +62,24 @@ class UserInterface():
         elif element == 'Empire':
             self.empire.click()
         else:
-            l
+            logging.warning(f"Element {element} is unknown or cannot be reached.")
     
 class Buttons(BaseModel):
     world_map: WebElement | None
     clan: WebElement | None
     reports: WebElement | None
     messages: WebElement | None
+    
+    def navigate(self, target: Literal["Map", "Clan", "Reports", "Messages"]):
+        if target == 'Map':
+            self.world_map.click()
+        elif target == 'Clan':
+            self.clan.click()
+        elif target == 'Reports':
+            self.reports.click()
+        elif target == 'Messages':
+            self.messages.click()
+        else:
+            logging.warning(f"Button {target} is unknown or cannot be reached.")
+        
+    model_config = ConfigDict(arbitrary_types_allowed=True)
