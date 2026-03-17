@@ -14,8 +14,7 @@ from modules.character import Char
 from modules.utils import incremental_wait
 
 # LOGGING FORMAT
-log_path = './logs'
-logging.basicConfig(format=f'%(asctime)s | %(levelname)s - %(message)s', datefmt='%d.%m.%Y %H:%M:%S', level=logging.INFO, filename=f'{log_path}/main.log', force=True)
+logging.basicConfig(format=f'%(asctime)s | %(levelname)s - %(message)s', datefmt='%d.%m.%Y %H:%M:%S', level=logging.INFO, filename='./logs/main.log', force=True)
 
 class Bot():
     def __init__(self) -> None:

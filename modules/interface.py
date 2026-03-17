@@ -5,6 +5,15 @@ from selenium.webdriver.firefox import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
+from modules import config as cfg
+
+# LOGGER
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler("logs/interface.log")
+formatter = cfg.FORMATTER
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 class UserInterface():
     def __init__(self, browser: webdriver.WebDriver) -> None:
         self.browser = browser
@@ -62,7 +71,7 @@ class UserInterface():
         elif element == 'Empire':
             self.empire.click()
         else:
-            logging.warning(f"Element {element} is unknown or cannot be reached.")
+            logger.warning(f"Element {element} is unknown or cannot be reached.")
     
 class Buttons(BaseModel):
     world_map: WebElement | None
@@ -80,6 +89,6 @@ class Buttons(BaseModel):
         elif target == 'Messages':
             self.messages.click()
         else:
-            logging.warning(f"Button {target} is unknown or cannot be reached.")
+            logger.warning(f"Button {target} is unknown or cannot be reached.")
         
     model_config = ConfigDict(arbitrary_types_allowed=True)

@@ -1,6 +1,16 @@
+import logging
 from typing import Literal
 from selenium.webdriver.firefox import webdriver
 from selenium.webdriver.common.by import By
+
+from modules import config as cfg
+
+# LOGGER
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler("logs/char.log")
+formatter = cfg.FORMATTER
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class Char():
     def __init__(self, browser: webdriver.WebDriver):

@@ -9,6 +9,13 @@ from selenium.common.exceptions import TimeoutException
 
 from modules import config as cfg
 
+# LOGGER
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler("logs/utils.log")
+formatter = cfg.FORMATTER
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 def incremental_wait(browser: webdriver.WebDriver, ec: EC = EC.presence_of_element_located, by: By = By.ID, value: str = None) -> WebElement | list[WebElement]:
     wait = WebDriverWait(browser, cfg.WAIT)
     wait_l = WebDriverWait(browser, cfg.WAIT*2)
@@ -25,4 +32,4 @@ def incremental_wait(browser: webdriver.WebDriver, ec: EC = EC.presence_of_eleme
                 sleep(cfg.PROCEEDURE_WAIT)
                 return wait_xl.until(ec((by, value)))
             finally:
-                logging.exception(f"Failed all tries to find \"{value}\" element")
+                logger.exception(f"Failed all tries to find \"{value}\" element")
