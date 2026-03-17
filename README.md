@@ -10,8 +10,6 @@ I have a lot of ideas for improvements and new functions, so there is potential,
 
 ## Modules 
 
-- PyQt for rendering user interface.
 - Selenium for browser actions automation.
-- keyboard for keygen, which helps designing path for exping.
 
 other modules have just a supporting purpose.
